@@ -130,9 +130,8 @@ app.use((req, res) => {
 
 
 // ================= START SERVER =================
-server.listen(5000, () => {
+const PORT = process.env.PORT;
 
-    console.log(
-        "SERVER RUNNING 🚀"
-    );
+server.listen(PORT, "0.0.0.0", () => {
+    console.log(`SERVER RUNNING ON PORT ${PORT} 🚀`);
 });
