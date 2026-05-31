@@ -1,0 +1,188 @@
+/* ================= BODY ================= */
+
+body {
+
+    margin: 0;
+
+    padding: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #e9edf2;
+}
+
+
+
+/* ================= LOGIN CONTAINER ================= */
+
+.login-container {
+
+    height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background:
+    linear-gradient(
+        135deg,
+        #dfe9f3,
+        #ffffff
+    );
+}
+
+
+
+/* ================= LOGIN FORM ================= */
+
+.login-form {
+
+    width: 380px;
+
+    background: white;
+
+    padding: 45px;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 8px 25px
+    rgba(0,0,0,0.08);
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+
+/* ================= TITLE ================= */
+
+.login-title {
+
+    margin: 0;
+
+    text-align: center;
+
+    color: #2c3e50;
+
+    font-size: 32px;
+
+    font-weight: bold;
+}
+
+
+
+/* ================= SUBTITLE ================= */
+
+.login-subtitle {
+
+    text-align: center;
+
+    color: #7f8c8d;
+
+    margin-top: 10px;
+
+    margin-bottom: 30px;
+
+    font-size: 15px;
+}
+
+
+
+/* ================= INPUT ================= */
+
+.login-form input {
+
+    height: 50px;
+
+    margin-bottom: 18px;
+
+    border:
+    1px solid #dcdcdc;
+
+    border-radius: 12px;
+
+    padding: 0 15px;
+
+    font-size: 15px;
+
+    outline: none;
+
+    background: #fafafa;
+
+    transition: 0.3s;
+}
+
+
+
+/* ================= INPUT FOCUS ================= */
+
+.login-form input:focus {
+
+    border:
+    1px solid #34495e;
+
+    background: white;
+
+    box-shadow:
+    0 0 5px
+    rgba(52,73,94,0.2);
+}
+
+
+
+/* ================= BUTTON ================= */
+
+.login-form button {
+
+    height: 50px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #2c3e50;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+
+/* ================= BUTTON HOVER ================= */
+
+.login-form button:hover {
+
+    background: #1f2d3a;
+
+    transform: translateY(-2px);
+}
+
+
+
+/* ================= MOBILE ================= */
+
+@media screen and (max-width: 480px) {
+
+    .login-form {
+
+        width: 90%;
+
+        padding: 30px;
+    }
+
+    .login-title {
+
+        font-size: 26px;
+    }
+}
