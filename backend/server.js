@@ -113,7 +113,11 @@ io.on("connection", (socket) => {
             );
         }
     );
-
+console.log("CORS ORIGIN CHECK");
+console.log([
+  "http://localhost:3000",
+  "https://chat-app-tau-sable-24.vercel.app"
+]);
 
     // DISCONNECT
     socket.on(
