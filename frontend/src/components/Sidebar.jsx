@@ -19,7 +19,8 @@ const Sidebar = ({
     const [users, setUsers] =
         useState([]);
 
-
+console.log("API BASE URL:", API.defaults.baseURL);
+console.log("FETCHING USERS...");
     // ================= FETCH USERS =================
     const fetchUsers =
         useCallback(async () => {
@@ -65,12 +66,14 @@ const Sidebar = ({
 
     // ================= LOAD USERS =================
     useEffect(() => {
+    const fetchUsers = async () => {
+        const res = await API.get("/users/all-users");
+        const filtered = res.data.filter(u => u.id !== currentUserId);
+        setUsers(filtered);
+    };
 
-        fetchUsers();
-
-    }, [fetchUsers]);
-
-
+    fetchUsers();
+}, [currentUserId]);
     return (
 
         <div className="sidebar">

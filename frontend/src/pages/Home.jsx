@@ -1,73 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Sidebar from "./Sidebar";
 
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
-import ChatWindow from "../components/ChatWindow";
+function Home() {
 
-const Home = () => {
+    const [messages, setMessages] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-    const [selectedUser, setSelectedUser] =
-        useState(null);
+    const user = JSON.parse(localStorage.getItem("user"));
 
-    const user =
-        JSON.parse(localStorage.getItem("user"));
+    // 🔥 LOAD MESSAGES WHEN USER CHANGES
+    useEffect(() => {
+        if (!selectedUser) return;
+
+        fetch(`http://localhost:5000/api/messages/chat/${user.id}/${selectedUser.id}`)
+            .then(res => res.json())
+            .then(data => setMessages(data));
+
+    }, [selectedUser]);
 
     return (
+        <div style={{ display: "flex" }}>
 
-        <div>
-<h1>BUILD VERSION 2026-06-04-TEST</h1>
-            <Navbar />
+            {/* SIDEBAR */}
+            <Sidebar
+                currentUserId={user.id}
+                setSelectedUser={setSelectedUser}
+            />
 
-            <div
-                style={{
+            {/* CHAT BOX */}
+            <div>
+                {selectedUser ? (
+                    <>
+                        <h3>Chat with {selectedUser.username}</h3>
 
-                    display: "flex",
-
-                    height: "90vh"
-                }}
-            >
-
-                <Sidebar
-                    currentUserId={user.id}
-                    setSelectedUser={setSelectedUser}
-                />
-
-                {
-                    selectedUser ? (
-
-                        <ChatWindow
-                            senderId={user.id}
-                            receiverId={selectedUser.id}
-                            selectedUser={selectedUser}
-                        />
-
-                    ) : (
-
-                        <div style={{
-
-                            width: "70%",
-
-                            display: "flex",
-
-                            justifyContent: "center",
-
-                            alignItems: "center",
-
-                            fontSize: "22px",
-
-                            color: "gray"
-                        }}>
-
-                            Select User To Chat 💬
-
-                        </div>
-                    )
-                }
-
+                        {messages.map(msg => (
+                            <div key={msg.id}>
+                                {msg.message}
+                            </div>
+                        ))}
+                    </>
+                ) : (
+                    <h3>Select a user</h3>
+                )}
             </div>
 
         </div>
     );
-};
+}
 
 export default Home;
