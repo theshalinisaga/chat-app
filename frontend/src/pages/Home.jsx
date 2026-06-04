@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "./Sidebar";
-
+import Sidebar from "../components/Sidebar";
 function Home() {
 
     const [messages, setMessages] = useState([]);
