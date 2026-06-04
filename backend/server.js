@@ -31,7 +31,6 @@ const io = require("socket.io")(server, {
     credentials: true
   }
 });
-const cors = require("cors");
 
 app.use(cors({
   origin: [
