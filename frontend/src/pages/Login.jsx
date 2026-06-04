@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import "../styles/login.css";
 function Login() {
 
@@ -19,13 +19,13 @@ function Login() {
 
         try {
 
-            const res = await axios.post(
-                "http://localhost:5000/api/auth/login",
-                {
-                    email,
-                    password
-                }
-            );
+           const res = await axios.post(
+    "https://chat-app-backend-3qjv.onrender.com/api/auth/login",
+    {
+        email,
+        password
+    }
+);
 
             console.log("LOGIN RESPONSE:", res.data);
 
