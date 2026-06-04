@@ -16,20 +16,30 @@ const server = http.createServer(app);
 
 
 // ================= SOCKET IO =================
-const io = new Server(server, {
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://chat-abyozc7c8-shalini-chatapp.vercel.app"
+];
 
-    cors: {
-
-        origin: "http://localhost:3000",
-
-        methods: ["GET", "POST"]
-    }
+const io = require("socket.io")(server, {
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://chat-app-tau-sable-24.vercel.app"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
+const cors = require("cors");
 
-
-// ================= MIDDLEWARE =================
-app.use(cors());
-
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://chat-app-tau-sable-24.vercel.app"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 
@@ -119,15 +129,11 @@ io.on("connection", (socket) => {
 
 
 // ================= 404 =================
-app.use((req, res) => {
-
-    res.status(404).json({
-
-        message:
-        "Route Not Found ❌"
+app.get("/", (req, res) => {
+    res.json({
+        message: "Chat App Backend Running 🚀"
     });
 });
-
 
 // ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
