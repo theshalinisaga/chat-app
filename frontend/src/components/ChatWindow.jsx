@@ -1,18 +1,13 @@
-import React,
-{
+import React, {
     useEffect,
     useState,
     useRef,
     useCallback
-}
-from "react";
+} from "react";
 
 import API from "../api/api";
-
-import "../styles/chatwindow.css";
-
 import socket from "../sockets/socket";
-
+import "../styles/chatwindow.css";
 
 const ChatWindow = ({
     senderId,
@@ -20,137 +15,68 @@ const ChatWindow = ({
     selectedUser
 }) => {
 
-    // ================= STATES =================
+    const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState("");
 
-    const [messages, setMessages] =
-        useState([]);
-
-    const [message, setMessage] =
-        useState("");
-
-    const messagesEndRef =
-        useRef(null);
-
-
+    const messagesEndRef = useRef(null);
 
     // ================= FETCH MESSAGES =================
 
-    const fetchMessages =
-        useCallback(async () => {
+    const fetchMessages = useCallback(async () => {
 
-            try {
+        if (!senderId || !receiverId) return;
 
-                if (
-                    !senderId ||
-                    !receiverId
-                ) return;
+        try {
 
+           const res = await API.get(
+    `/messages/chat/${senderId}/${receiverId}`
+);
 
-                console.log(
-                    "FETCHING MESSAGES 🚀"
-                );
+            setMessages(
+                Array.isArray(res.data)
+                    ? res.data
+                    : []
+            );
 
+        } catch (err) {
 
-                const res =
-                    await API.get(
-                        "/messages/get",
-                        {
-                            params: {
+            console.log(
+                "FETCH ERROR:",
+                err.response?.data || err.message
+            );
 
-                                sender_id:
-                                    senderId,
+            setMessages([]);
+        }
 
-                                receiver_id:
-                                    receiverId
-                            }
-                        }
-                    );
-
-
-                console.log(
-                    "MESSAGES:",
-                    res.data
-                );
-
-
-                setMessages(
-                    res.data
-                );
-
-            } catch (error) {
-
-                console.log(
-                    "FETCH ERROR:",
-                    error.response?.data
-                    || error.message
-                );
-            }
-
-        }, [
-            senderId,
-            receiverId
-        ]);
-
-
-
-    // ================= LOAD MESSAGES =================
+    }, [senderId, receiverId]);
 
     useEffect(() => {
-
         fetchMessages();
-
     }, [fetchMessages]);
 
-
-
-    // ================= SOCKET ROOM =================
+    // ================= SOCKET =================
 
     useEffect(() => {
 
         if (!senderId) return;
-
 
         socket.emit(
             "join_room",
             senderId
         );
 
+        const receiveHandler = (data) => {
 
-        console.log(
-            "ROOM JOINED:",
-            senderId
-        );
-
-    }, [senderId]);
-
-
-
-    // ================= RECEIVE REALTIME =================
-
-    useEffect(() => {
-
-        const receiveHandler =
-            (data) => {
-
-                console.log(
-                    "REALTIME:",
-                    data
-                );
-
-                setMessages(
-                    (prev) => [
-                        ...prev,
-                        data
-                    ]
-                );
-            };
-
+            setMessages(prev => [
+                ...prev,
+                data
+            ]);
+        };
 
         socket.on(
             "receive_message",
             receiveHandler
         );
-
 
         return () => {
 
@@ -160,230 +86,140 @@ const ChatWindow = ({
             );
         };
 
-    }, []);
-
-
+    }, [senderId]);
 
     // ================= AUTO SCROLL =================
 
     useEffect(() => {
 
-        messagesEndRef.current
-            ?.scrollIntoView({
-
-                behavior: "smooth"
-            });
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth"
+        });
 
     }, [messages]);
 
-
-
     // ================= SEND MESSAGE =================
 
-    const sendMessage =
-        async () => {
+    const sendMessage = async () => {
 
-            try {
+        if (!message.trim()) return;
 
-                if (
-                    message.trim() === ""
-                ) return;
-
-
-                const msgData = {
-
-                    sender_id:
-                        senderId,
-
-                    receiver_id:
-                        receiverId,
-
-                    message
-                };
-
-
-                console.log(
-                    "SENDING:",
-                    msgData
-                );
-
-
-                // ================= SAVE TO DB =================
-
-                const res =
-                    await API.post(
-                        "/messages/send",
-                        msgData
-                    );
-
-
-                console.log(
-                    "SAVED:",
-                    res.data
-                );
-
-
-                // ================= SOCKET EMIT =================
-
-                socket.emit(
-                    "send_message",
-                    msgData
-                );
-
-
-                // ================= UI UPDATE =================
-
-                setMessages(
-                    (prev) => [
-                        ...prev,
-                        msgData
-                    ]
-                );
-
-
-                // ================= CLEAR INPUT =================
-
-                setMessage("");
-
-            } catch (error) {
-
-                console.log(
-                    "SEND ERROR:",
-                    error.response?.data
-                    || error.message
-                );
-            }
+        const msgData = {
+            sender_id: senderId,
+            receiver_id: receiverId,
+            message: message.trim()
         };
 
+        try {
 
+            console.log(
+                "SENDING:",
+                msgData
+            );
+
+            await API.post(
+                "/messages/send",
+                msgData
+            );
+
+            socket.emit(
+                "send_message",
+                msgData
+            );
+
+            setMessages(prev => [
+                ...prev,
+                msgData
+            ]);
+
+            setMessage("");
+
+        } catch (err) {
+
+            console.log(
+                "SEND ERROR:",
+                err.response?.data || err.message
+            );
+        }
+    };
 
     return (
 
         <div className="chat-window">
 
-            {/* ================= HEADER ================= */}
+            {/* HEADER */}
 
             <div className="chat-header">
 
-                <div>
-
-                    <h3>
-
-                        {
-                            selectedUser
-                                ?.username
-                        }
-
-                    </h3>
-
-                    <small>
-
-                        Online
-
-                    </small>
-
-                </div>
+                <h3>
+                    {selectedUser?.username}
+                </h3>
 
             </div>
 
-
-
-            {/* ================= CHAT BODY ================= */}
+            {/* BODY */}
 
             <div className="chat-body">
 
-                {
-                    messages.map(
-                        (msg, index) => (
+                {messages.length === 0 ? (
+
+                    <p className="empty-chat">
+                        No messages yet 💬
+                    </p>
+
+                ) : (
+
+                    messages.map((msg, index) => (
+
+                        <div
+                            key={index}
+                            className={
+                                msg.sender_id === senderId
+                                    ? "message-row own"
+                                    : "message-row"
+                            }
+                        >
 
                             <div
-
-                                key={index}
-
                                 className={
-
-                                    msg.sender_id
-                                        === senderId
-
-                                        ? "message-row own"
-
-                                        : "message-row"
+                                    msg.sender_id === senderId
+                                        ? "message own-msg"
+                                        : "message"
                                 }
                             >
-
-                                <div
-
-                                    className={
-
-                                        msg.sender_id
-                                            === senderId
-
-                                            ? "message own-msg"
-
-                                            : "message"
-                                    }
-                                >
-
-                                    {
-                                        msg.message
-                                    }
-
-                                </div>
-
+                                {msg.message}
                             </div>
-                        ))
-                }
 
+                        </div>
+                    ))
+                )}
 
-                {/* ================= AUTO SCROLL ================= */}
-
-                <div
-                    ref={messagesEndRef}
-                />
+                <div ref={messagesEndRef}></div>
 
             </div>
 
-
-
-            {/* ================= FOOTER ================= */}
+            {/* FOOTER */}
 
             <div className="chat-footer">
 
                 <input
-
                     type="text"
-
-                    placeholder=
-                    "Type a message..."
-
+                    placeholder="Type a message..."
                     value={message}
-
                     onChange={(e) =>
-                        setMessage(
-                            e.target.value
-                        )
+                        setMessage(e.target.value)
                     }
-
                     onKeyDown={(e) => {
-
-                        if (
-                            e.key === "Enter"
-                        ) {
-
+                        if (e.key === "Enter") {
                             sendMessage();
                         }
                     }}
                 />
 
-
                 <button
-                    onClick={
-                        sendMessage
-                    }
+                    onClick={sendMessage}
                 >
-
                     Send
-
                 </button>
 
             </div>

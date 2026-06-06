@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import API from "../api/api";
-
+import "../styles/sidebar.css";
 const Sidebar = ({ currentUserId, setSelectedUser }) => {
 
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-
+    
         const fetchUsers = async () => {
             try {
-                const res = await API.get("/users/all-users");
+                const res = await API.get("https://chat-app-backend-3qjv.onrender.com/api/users/all-users");
 
                 console.log("ALL USERS:", res.data);
 
@@ -51,6 +51,7 @@ const Sidebar = ({ currentUserId, setSelectedUser }) => {
             )}
 
         </div>
+        
     );
 };
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import {  useNavigate } from "react-router-dom";
 import "../styles/login.css";
-import Register from "./pages/Register";
+import Register from "./Register";
 function Login() {
 
     const navigate = useNavigate();

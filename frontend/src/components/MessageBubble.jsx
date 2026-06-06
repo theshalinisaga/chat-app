@@ -5,12 +5,21 @@ import "../styles/message.css";
 function MessageBubble({ text, own }) {
 
     return (
+    
+        <div className="chat-messages">
 
-        <div className={own ? "my-message" : "other-message"}>
+    {messages.map((msg) => (
 
-            {text}
+        <MessageBubble
+            key={msg.id}
+            text={msg.message}
+            own={msg.sender_id === currentUser.id}
+        />
 
-        </div>
+    ))}
+
+</div>
+       
     );
 }
 
