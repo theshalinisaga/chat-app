@@ -2,40 +2,58 @@ const express = require("express");
 
 const router = express.Router();
 
-const db = require("../config/db");
+const supabase =
+require("../config/supabase");
 
 
-// TEST ROUTE
+// ================= TEST ROUTE =================
+
 router.get("/test", (req, res) => {
 
     res.json({
         message: "User Route Working 🚀"
     });
+
 });
 
 
-// GET ALL USERS
-router.get("/all-users", (req, res) => {
+// ================= GET ALL USERS =================
 
-    const sql = `
-        SELECT
-        id,
-        username,
-        email
-        FROM users
-    `;
+router.get("/all-users", async (req, res) => {
 
-    db.query(sql, (err, result) => {
+    try {
 
-        if (err) {
+        const {
+            data,
+            error
+        } = await supabase
+            .from("users")
+            .select(
+                "id, username, email"
+            );
 
-            console.log(err);
+        if (error) {
 
-            return res.status(500).json(err);
+            console.log(error);
+
+            return res
+                .status(500)
+                .json(error);
         }
 
-        res.json(result);
-    });
+        res.json(data);
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message:
+                "Server Error"
+        });
+    }
+
 });
+
 
 module.exports = router;

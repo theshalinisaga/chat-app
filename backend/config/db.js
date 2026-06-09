@@ -1,20 +1,22 @@
-console.log("USING DB HOST:", "sql12.freesqldatabase.com");
-const mysql = require("mysql2");
+const { Pool } = require("pg");
 
-const db = mysql.createConnection({
-  host: "sql12.freesqldatabase.com",
-  user: "sql12828739",
-  password: "hrer6hbmwQ",
-  database: "sql12828739",
-  port: 3306
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-db.connect((err) => {
-  if (err) {
-    console.log("DB ERROR:", err);
-  } else {
-    console.log("MYSQL CONNECTED 🚀");
-  }
-});
+pool.connect()
+    .then(() => {
+        console.log("SUPABASE CONNECTED 🚀");
+    })
+    .catch((err) => {
+        console.log("DB ERROR:", err);
+    });
 
-module.exports = db;
+module.exports = pool;

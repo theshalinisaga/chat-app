@@ -1,4 +1,4 @@
-
+require("dotenv").config();
 const express = require("express");
 
 const http = require("http");
@@ -18,6 +18,7 @@ const server = http.createServer(app);
 // ================= SOCKET IO =================
 const allowedOrigins = [
   "http://localhost:3000",
+  "https://chat-app-tau-sable-24.vercel.app",
   "https://chat-abyozc7c8-shalini-chatapp.vercel.app"
 ];
 
@@ -25,6 +26,7 @@ const io = require("socket.io")(server, {
   cors: {
     origin: [
       "http://localhost:3000",
+      "https://chat-lje6aq0v8-shalini-chatapp.vercel.app/",
       "https://chat-app-tau-sable-24.vercel.app"
     ],
     methods: ["GET", "POST"],
@@ -35,6 +37,7 @@ const io = require("socket.io")(server, {
 app.use(cors({
   origin: [
     "http://localhost:3000",
+    "https://chat-lje6aq0v8-shalini-chatapp.vercel.app/",
     "https://chat-app-tau-sable-24.vercel.app"
   ],
   credentials: true

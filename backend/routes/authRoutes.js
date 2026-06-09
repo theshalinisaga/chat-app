@@ -2,161 +2,192 @@ const express = require("express");
 
 const router = express.Router();
 
-const db = require("../config/db");
+const supabase =
+require("../config/supabase");
 
-const bcrypt = require("bcrypt");
+const bcrypt =
+require("bcrypt");
 
-const jwt = require("jsonwebtoken");
+const jwt =
+require("jsonwebtoken");
 
 
 // ================= REGISTER =================
-router.post("/register", async (req, res) => {
 
-    try {
+router.post(
+    "/register",
+    async (req, res) => {
 
-        console.log(req.body);
+        try {
 
-        const { username, email, password } = req.body;
+            const {
+                username,
+                email,
+                password
+            } = req.body;
 
-        if (!username || !email || !password) {
+            if (
+                !username ||
+                !email ||
+                !password
+            ) {
 
-            return res.status(400).json({
-                message: "All fields required"
-            });
-        }
-
-        const checkSql = "SELECT * FROM users WHERE email = ?";
-
-        db.query(checkSql, [email], async (err, result) => {
-
-            if (err) {
-
-                console.log(err);
-
-                return res.status(500).json(err);
-            }
-
-            if (result.length > 0) {
-
-                return res.status(400).json({
-                    message: "User already exists"
-                });
-            }
-
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            const sql = `
-                INSERT INTO users
-                (username, email, password)
-                VALUES (?, ?, ?)
-            `;
-
-            db.query(
-                sql,
-                [username, email, hashedPassword],
-                (err, data) => {
-
-                    if (err) {
-
-                        console.log(err);
-
-                        return res.status(500).json(err);
-                    }
-
-                    res.json({
-                        message: "Register Success 🚀"
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                        "All fields required"
                     });
-                }
-            );
-        });
-
-    } catch (error) {
-
-        console.log(error);
-
-        res.status(500).json(error);
-    }
-});
-
-
-// ================= LOGIN =================
-router.post("/login", (req, res) => {
-
-    try {
-
-        console.log(req.body);
-
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-
-            return res.status(400).json({
-                message: "Email and Password required"
-            });
-        }
-
-        const sql = "SELECT * FROM users WHERE email = ?";
-
-        db.query(sql, [email], async (err, result) => {
-
-            if (err) {
-
-                console.log(err);
-
-                return res.status(500).json(err);
             }
 
-            if (result.length === 0) {
+            // CHECK USER
 
-                return res.status(401).json({
-                    message: "User not found"
-                });
+            const {
+                data: existingUser,
+                error: checkError
+            } = await supabase
+                .from("users")
+                .select("*")
+                .eq(
+                    "email",
+                    email
+                );
+
+            if (checkError) {
+
+                console.log(
+                    checkError
+                );
+
+                return res
+                    .status(500)
+                    .json(
+                        checkError
+                    );
             }
 
-            const user = result[0];
+            if (
+                existingUser.length > 0
+            ) {
 
-            const isMatch = await bcrypt.compare(
-                password,
-                user.password
-            );
-
-            if (!isMatch) {
-
-                return res.status(401).json({
-                    message: "Wrong password"
-                });
+                return res
+                    .status(400)
+                    .json({
+                        message:
+                        "User already exists"
+                    });
             }
 
-            const token = jwt.sign(
-                {
-                    id: user.id
-                },
-                "secretkey",
-                {
-                    expiresIn: "1h"
-                }
-            );
+            // HASH PASSWORD
+
+            const hashedPassword =
+                await bcrypt.hash(
+                    password,
+                    10
+                );
+
+            // INSERT USER
+
+            const {
+                error
+            } = await supabase
+                .from("users")
+                .insert([
+                    {
+                        username,
+                        email,
+                        password:
+                        hashedPassword
+                    }
+                ]);
+
+            if (error) {
+
+                console.log(
+                    error
+                );
+
+                return res
+                    .status(500)
+                    .json(error);
+            }
 
             res.json({
 
-                message: "Login Success 🚀",
+                message:
+                "Register Success 🚀"
 
-                token,
-
-                user: {
-
-                    id: user.id,
-
-                    username: user.username,
-
-                    email: user.email
-                }
             });
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(500).json({
+                message:
+                "Server Error"
+            });
+        }
+    }
+);
+
+
+// ================= LOGIN =================
+router.post("/login", async (req, res) => {
+
+    try {
+
+        console.log("LOGIN START");
+
+        const { email, password } = req.body;
+
+        console.log("EMAIL:", email);
+
+        const { data, error } = await supabase
+            .from("users")
+            .select("*")
+            .eq("email", email);
+
+        console.log("SUPABASE DATA:", data);
+        console.log("SUPABASE ERROR:", error);
+
+        if (error) {
+            return res.status(500).json(error);
+        }
+
+        if (data.length === 0) {
+            console.log("USER NOT FOUND");
+            return res.status(401).json({
+                message: "User not found"
+            });
+        }
+
+        const user = data[0];
+
+        console.log("USER FOUND:", user.email);
+
+        const isMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        console.log("PASSWORD MATCH:", isMatch);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                message: "Wrong password"
+            });
+        }
+
+        console.log("LOGIN SUCCESS");
+
+        res.json({
+            message: "Login Success"
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.log("LOGIN CRASH:", error);
 
         res.status(500).json(error);
     }
