@@ -142,6 +142,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/db-test", (req,res)=>{
+     res.send("DB Test Route Working 🚀");
 
     db.query(
         "SELECT 1",
@@ -161,6 +162,25 @@ app.get("/db-test", (req,res)=>{
         }
     );
 
+});
+const db = require("./config/db");
+
+app.get("/db-test", (req, res) => {
+
+    db.query(
+        "SELECT 1",
+        (err, result) => {
+
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({
+                success: true,
+                result
+            });
+        }
+    );
 });
 // ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
