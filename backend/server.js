@@ -141,6 +141,27 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/db-test", (req,res)=>{
+
+    db.query(
+        "SELECT 1",
+        (err,result)=>{
+
+            if(err){
+                return res.json({
+                    success:false,
+                    error:err.message
+                });
+            }
+
+            res.json({
+                success:true,
+                result
+            });
+        }
+    );
+
+});
 // ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
 
