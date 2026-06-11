@@ -7,13 +7,13 @@ const pool = new Pool({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
     ssl: {
-        rejectUnauthorized: false
-    }
+        rejectUnauthorized: false,
+    },
 });
 
 pool.connect()
     .then(() => {
-        console.log("SUPABASE CONNECTED 🚀");
+        console.log("POSTGRES CONNECTED ✅");
     })
     .catch((err) => {
         console.log("DB ERROR:", err);
