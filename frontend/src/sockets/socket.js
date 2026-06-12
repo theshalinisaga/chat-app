@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://chat-app-backend-3qjv.onrender.com");
+const socket = io("https://chat-appbackend-u7x3.onrender.com");
 
 export default socket;
