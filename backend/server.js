@@ -182,6 +182,9 @@ app.get("/db-test", (req, res) => {
         }
     );
 });
+console.log("HOST:", process.env.DB_HOST);
+console.log("USER:", process.env.DB_USER);
+console.log("DB:", process.env.DB_NAME);
 // ================= START SERVER =================
 const PORT = process.env.PORT || 5000;
 
