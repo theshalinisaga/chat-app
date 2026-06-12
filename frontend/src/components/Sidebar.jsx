@@ -9,7 +9,7 @@ const Sidebar = ({ currentUserId, setSelectedUser }) => {
     
         const fetchUsers = async () => {
             try {
-                const res = await API.get("https://chat-app-backend-3qjv.onrender.com/api/users/all-users");
+                const res = await API.get("https://chat-appbackend-u7x3.onrender.com/api/users/all-users");
 
                 console.log("ALL USERS:", res.data);
 

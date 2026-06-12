@@ -21,7 +21,7 @@ function Login() {
         try {
 
            const res = await axios.post(
-    "https://chat-app-backend-3qjv.onrender.com/api/auth/login",
+    "https://chat-appbackend-u7x3.onrender.com/api/auth/login",
     {
         email,
         password
