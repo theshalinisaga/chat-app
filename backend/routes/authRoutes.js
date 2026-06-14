@@ -10,6 +10,9 @@ const jwt = require("jsonwebtoken");
 
 router.post("/register", async (req, res) => {
 
+    console.log("REGISTER API HIT 🚀");
+    console.log(req.body);
+
     try {
 
         const {

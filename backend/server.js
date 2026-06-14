@@ -12,31 +12,34 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://chat-app-tau-sable-24.vercel.app/",
-  
-  "https://chat-lje6aq0v8-shalini-chatapp.vercel.app"
+  "https://chat-app-tau-sable-24.vercel.app",
+
 ];
 
 
 // ================= SOCKET.IO =================
 
 const io = require("socket.io")(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
-  }
+    cors: {
+        origin: [
+            "http://localhost:3000",
+            "https://chat-app-tau-sable-24.vercel.app"
+        ],
+        methods: ["GET", "POST"],
+        credentials: true
+    }
 });
 
 
 // ================= MIDDLEWARE =================
-
-app.use(
-  cors({
-    origin: allowedOrigins,
+app.use(cors({
+    origin: [
+        "http://localhost:3000",
+        "https://chat-app-tau-sable-24.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
-  })
-);
+}));
 
 app.use(express.json());
 
