@@ -17,7 +17,7 @@ function Register() {
 
         try {
 
-            const res = await axios.post(
+            const res = await axios.get(
                "https://chat-appbackend-u7x3.onrender.com/api/auth/register",
                 {
                     username,
@@ -82,10 +82,7 @@ function Register() {
                 <button type="submit">
                     Register
                 </button>
-                console.log("REGISTER CLICKED 🚀");
-console.log(username);
-console.log(email);
-console.log(password);
+                
 
             </form>
 
