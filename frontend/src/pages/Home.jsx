@@ -7,9 +7,13 @@ function Home() {
 
     const [selectedUser, setSelectedUser] = useState(null);
 
-    const user = JSON.parse(
-        localStorage.getItem("user")
-    );
+   const user = JSON.parse(
+ localStorage.getItem("user")
+ || "{}"
+);
+if (!user.id) {
+   return <h2>User Not Found</h2>;
+}
 
     return (
 
