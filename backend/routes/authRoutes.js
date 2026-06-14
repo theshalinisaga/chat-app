@@ -34,14 +34,13 @@ router.post("/register", async (req, res) => {
 
         // CHECK USER EXISTS
 
-        const {
-            data: existingUser,
-            error: checkError
-        } = await supabase
-            .from("users")
-            .select("*")
-            .eq("email", email);
-
+        
+const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("email", email);
+    console.log("DATA:", data);
+console.log("ERROR:", error);
         if (checkError) {
 
             console.log(checkError);
