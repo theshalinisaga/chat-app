@@ -6,55 +6,20 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // ================= REGISTER =================
-
 router.post("/register", async (req, res) => {
-
-    console.log("REGISTER API HIT 🚀");
-    console.log(req.body);
 
     try {
 
         const { username, email, password } = req.body;
 
-        if (!username || !email || !password) {
-            return res.status(400).json({
-                message: "All fields required"
-            });
-        }
-
-        // CHECK USER EXISTS
-
-        const {
-            data: existingUser,
-            error: checkError
-        } = await supabase
-            .from("users")
-            .select("*")
-            .eq("email", email);
-
-        console.log("EXISTING USER:", existingUser);
-        console.log("CHECK ERROR:", checkError);
-
-        if (checkError) {
-            return res.status(500).json(checkError);
-        }
-
-        if (existingUser.length > 0) {
-            return res.status(400).json({
-                message: "User already exists"
-            });
-        }
-
         // HASH PASSWORD
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // INSERT USER
-
-        const {
-            data: newUser,
-            error: insertError
-        } = await supabase
+console.log("ORIGINAL:", password);
+console.log("HASHED:", hashedPassword);
+        // SAVE HASHED PASSWORD
+        const { data, error } = await supabase
             .from("users")
             .insert([
                 {
@@ -65,26 +30,25 @@ router.post("/register", async (req, res) => {
             ])
             .select();
 
-        if (insertError) {
-            console.log(insertError);
-            return res.status(500).json(insertError);
+        if (error) {
+            return res.status(500).json(error);
         }
 
         return res.status(201).json({
             success: true,
-            message: "Register Success 🚀",
-            user: newUser[0]
+            message: "Register Success 🚀"
         });
 
-    } catch (error) {
+    } catch (err) {
 
-        console.log("REGISTER ERROR:", error);
+        console.log(err);
 
         return res.status(500).json({
             message: "Server Error"
         });
     }
 });
+
 
 // ================= LOGIN =================
 
