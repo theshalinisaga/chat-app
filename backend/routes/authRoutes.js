@@ -5,7 +5,6 @@ const supabase = require("../config/supabase");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
 // ================= REGISTER =================
 
 router.post("/register", async (req, res) => {
@@ -15,18 +14,9 @@ router.post("/register", async (req, res) => {
 
     try {
 
-        const {
-            username,
-            email,
-            password
-        } = req.body;
+        const { username, email, password } = req.body;
 
-        if (
-            !username ||
-            !email ||
-            !password
-        ) {
-
+        if (!username || !email || !password) {
             return res.status(400).json({
                 message: "All fields required"
             });
@@ -34,22 +24,22 @@ router.post("/register", async (req, res) => {
 
         // CHECK USER EXISTS
 
-        
-const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("email", email);
-    console.log("DATA:", data);
-console.log("ERROR:", error);
+        const {
+            data: existingUser,
+            error: checkError
+        } = await supabase
+            .from("users")
+            .select("*")
+            .eq("email", email);
+
+        console.log("EXISTING USER:", existingUser);
+        console.log("CHECK ERROR:", checkError);
+
         if (checkError) {
-
-            console.log(checkError);
-
             return res.status(500).json(checkError);
         }
 
         if (existingUser.length > 0) {
-
             return res.status(400).json({
                 message: "User already exists"
             });
@@ -57,14 +47,13 @@ console.log("ERROR:", error);
 
         // HASH PASSWORD
 
-        const hashedPassword =
-            await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // INSERT USER
 
         const {
-            data,
-            error
+            data: newUser,
+            error: insertError
         } = await supabase
             .from("users")
             .insert([
@@ -76,29 +65,26 @@ console.log("ERROR:", error);
             ])
             .select();
 
-        if (error) {
-
-            console.log(error);
-
-            return res.status(500).json(error);
+        if (insertError) {
+            console.log(insertError);
+            return res.status(500).json(insertError);
         }
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: "Register Success 🚀",
-            user: data[0]
+            user: newUser[0]
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.log("REGISTER ERROR:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         });
     }
 });
-
 
 // ================= LOGIN =================
 
@@ -108,10 +94,7 @@ router.post("/login", async (req, res) => {
 
         console.log("LOGIN START");
 
-        const {
-            email,
-            password
-        } = req.body;
+        const { email, password } = req.body;
 
         const {
             data,
@@ -122,14 +105,11 @@ router.post("/login", async (req, res) => {
             .eq("email", email);
 
         if (error) {
-
             console.log(error);
-
             return res.status(500).json(error);
         }
 
         if (!data || data.length === 0) {
-
             return res.status(401).json({
                 message: "User not found"
             });
@@ -137,20 +117,16 @@ router.post("/login", async (req, res) => {
 
         const user = data[0];
 
-        const isMatch =
-            await bcrypt.compare(
-                password,
-                user.password
-            );
+        const isMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
 
         if (!isMatch) {
-
             return res.status(401).json({
                 message: "Wrong password"
             });
         }
-
-        // JWT TOKEN
 
         const token = jwt.sign(
             {
@@ -166,26 +142,21 @@ router.post("/login", async (req, res) => {
         console.log("LOGIN SUCCESS");
 
         return res.status(200).json({
-
             success: true,
-
             message: "Login Success 🚀",
-
             token,
-
             user: {
                 id: user.id,
                 username: user.username,
                 email: user.email
             }
-
         });
 
     } catch (error) {
 
         console.log("LOGIN CRASH:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         });
     }
