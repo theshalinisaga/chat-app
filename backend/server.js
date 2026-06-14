@@ -12,7 +12,8 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://chat-app-tau-sable-24.vercel.app",
+  "https://chat-app-tau-sable-24.vercel.app/",
+  
   "https://chat-lje6aq0v8-shalini-chatapp.vercel.app"
 ];
 
